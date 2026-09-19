@@ -1,0 +1,132 @@
+version: "2"
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/alexjoedt/keycell
+
+linters:
+  enable:
+    - asasalint
+    - bidichk
+    - copyloopvar
+    - depguard
+    - dupl
+    - durationcheck
+    - embeddedstructfieldcheck
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - exptostd
+    - fatcontext
+    - gocheckcompilerdirectives
+    - gochecknoinits
+    - gocognit
+    - gocritic
+    - godot
+    - gomoddirectives
+    - goprintffuncname
+    - gosec
+    - govet
+    - iface
+    - ineffassign
+    - intrange
+    - makezero
+    - mirror
+    - modernize
+    - musttag
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nolintlint
+    - nosprintfhostport
+    - perfsprint
+    - predeclared
+    - reassign
+    - recvcheck
+    - revive
+    - sloglint
+    - staticcheck
+    - testableexamples
+    - tparallel
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - usetesting
+    - wastedassign
+    - whitespace
+
+  settings:
+    depguard:
+      rules:
+        "non-test files":
+          files:
+            - "!$test"
+          deny:
+            - pkg: math/rand$
+              desc: Use math/rand/v2 instead
+        "non-main files":
+          files:
+            - "!**/main.go"
+          deny:
+            - pkg: log$
+              desc: Use log/slog instead
+
+    embeddedstructfieldcheck:
+      forbid-mutex: true
+
+    errcheck:
+      check-type-assertions: true
+
+    exhaustive:
+      default-signifies-exhaustive: true
+
+    gocognit:
+      min-complexity: 30
+
+    gosec:
+      excludes:
+        - G104 # unhandled errors, covered by errcheck
+        - G115 # int -> uint32 for UIDs and sizes
+        - G302 # 0700 socket directories are intended
+
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
+    perfsprint:
+      strconcat: false
+
+    sloglint:
+      no-global: all
+
+    usetesting:
+      os-temp-dir: true
+
+  exclusions:
+    warn-unused: true
+    presets:
+      - std-error-handling
+      - common-false-positives
+    rules:
+      # Sentinel errors are documented as "ErrX: what it means".
+      - text: 'comment on exported (var|const) \S+ should be of the form'
+        linters: [ revive ]
+      - path: '_test\.go'
+        linters:
+          - dupl
+          - errcheck
+          - gocognit
+          - gosec

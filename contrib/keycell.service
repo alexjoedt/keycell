@@ -1,0 +1,29 @@
+# keycell daemon, systemd user unit.
+#
+# Install:   make install-service
+#            (cp contrib/keycell.service ~/.config/systemd/user/ && systemctl --user daemon-reload)
+#            systemctl --user enable --now keycell
+#
+# ExecStart needs an absolute path. %h/.local/bin is where `make install`
+# puts the binary; adjust it to `which keycelld` if yours lives elsewhere.
+#
+# Headless machines (no TTY at boot, identity.txt without passphrase)
+# can unlock right after the socket is up; the daemon only reports
+# READY once it listens, so this drop-in is race-free:
+#
+#   # ~/.config/systemd/user/keycell.service.d/unlock.conf
+#   [Service]
+#   ExecStartPost=%h/.local/bin/keycell unlock
+
+[Unit]
+Description=keycell secrets daemon
+Documentation=https://github.com/alexjoedt/keycell
+
+[Service]
+Type=notify
+ExecStart=%h/.local/bin/keycelld
+Restart=on-failure
+NotifyAccess=main
+
+[Install]
+WantedBy=default.target
